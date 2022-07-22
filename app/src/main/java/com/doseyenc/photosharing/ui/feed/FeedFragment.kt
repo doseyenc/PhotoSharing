@@ -1,19 +1,19 @@
 package com.doseyenc.photosharing.ui.feed
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import com.doseyenc.photosharing.R
 import com.doseyenc.photosharing.databinding.FragmentFeedBinding
+import com.doseyenc.photosharing.ui.login.LoginActivity
+import com.google.firebase.auth.FirebaseAuth
 
 
 class FeedFragment : Fragment(R.layout.fragment_feed) {
     private var _binding: FragmentFeedBinding? = null
-    // This property is only valid between onCreateView and
-// onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,7 +22,32 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
     ): View? {
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
         val view = binding.root
+        auth = FirebaseAuth.getInstance()
+
+
+
         return view
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        binding.materialToolbar.setOnMenuItemClickListener { menuItem ->
+            val itemId: Int = menuItem.getItemId()
+            if (itemId == R.id.action_logout) {
+                logout()
+                return@setOnMenuItemClickListener true
+            } else {
+                return@setOnMenuItemClickListener false
+            }
+        }
+    }
+
+
+    private fun logout() {
+        auth.signOut()
+        startActivity(Intent(context, LoginActivity::class.java))
+        activity?.finish()
     }
 
     override fun onDestroyView() {
