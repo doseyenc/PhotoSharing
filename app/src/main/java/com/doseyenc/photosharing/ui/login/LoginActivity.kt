@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.doseyenc.photosharing.MainActivity
 import com.doseyenc.photosharing.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -21,33 +22,32 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         auth = Firebase.auth
 
+        val currentUser = auth.currentUser
+        isLogged(currentUser)
+
         binding.buttonSignUp.setOnClickListener {
-            /*createUser(
-                binding.editTextTextEmailAddress.toString(),
-                binding.editTextTextPassword.toString()
-            )*/
-            val email:String = binding.editTextTextEmailAddress.text.toString()
-            val password:String = binding.editTextTextPassword.text.toString()
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "createUserWithEmail:success")
-                        val user = auth.currentUser
-                        navigateToMain()
-                    } else {
-                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                        Toast.makeText(
-                            baseContext, "Authentication failed.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+
+            val email: String = binding.editTextTextEmailAddress.text.toString()
+            val password: String = binding.editTextTextPassword.text.toString()
+            createUser(
+                email,
+                password
+            )
         }
         binding.buttonLogin.setOnClickListener {
+            val email: String = binding.editTextTextEmailAddress.text.toString()
+            val password: String = binding.editTextTextPassword.text.toString()
             logIn(
-                binding.editTextTextEmailAddress.toString(),
-                binding.editTextTextPassword.toString()
+                email,
+                password
             )
+        }
+    }
+
+    private fun isLogged(currentUser: FirebaseUser?) {
+        if (currentUser != null) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
@@ -55,19 +55,26 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail:success")
                     val user = auth.currentUser
+                    Toast.makeText(
+                        baseContext, "Hoşgeldiniz ${user?.email}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     navigateToMain()
                 } else {
-                    // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(
                         baseContext, "Authentication failed.",
                         Toast.LENGTH_SHORT
                     ).show()
-                    //updateUI(null)
+
                 }
+            }.addOnFailureListener { exception ->
+                Toast.makeText(
+                    baseContext, exception.localizedMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
     }
@@ -86,6 +93,11 @@ class LoginActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+            }.addOnFailureListener { exception ->
+                Toast.makeText(
+                    baseContext, exception.localizedMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
