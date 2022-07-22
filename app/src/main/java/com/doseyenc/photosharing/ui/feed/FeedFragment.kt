@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.doseyenc.photosharing.R
 import com.doseyenc.photosharing.databinding.FragmentFeedBinding
 import com.doseyenc.photosharing.ui.login.LoginActivity
@@ -40,6 +41,9 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             } else {
                 return@setOnMenuItemClickListener false
             }
+        }
+        binding.fabUploadImage.setOnClickListener {
+            findNavController().navigate(R.id.action_feedFragment_to_uploadFragment)
         }
     }
 
