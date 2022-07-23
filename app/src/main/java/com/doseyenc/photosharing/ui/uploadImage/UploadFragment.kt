@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.doseyenc.photosharing.R
 import com.doseyenc.photosharing.databinding.FragmentUploadBinding
+import com.google.firebase.storage.FirebaseStorage
 
 
 class UploadFragment : Fragment(R.layout.fragment_upload) {
@@ -24,6 +25,7 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
     private val binding get() = _binding!!
     var selectedImage: Uri? = null
     var selectecBitmap: Bitmap? = null
+    private lateinit var storage: FirebaseStorage
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,28 +39,35 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
     override fun onResume() {
         super.onResume()
         binding.imageViewSelect.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                //izin alınmamış
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
-            } else {
-                //izin zaten varsa
-                val galleryIntent =
-                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                startActivityForResult(galleryIntent, 2)
-            }
+           handlePermission()
         }
 
 
 
 
         binding.buttonShare.setOnClickListener {
+            //depo işlemleri
+            val storage = FirebaseStorage.getInstance()
 
         }
     }
+
+    private fun handlePermission() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            //izin alınmamış
+            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+        } else {
+            //izin zaten varsa
+            val galleryIntent =
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(galleryIntent, 2)
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
