@@ -1,4 +1,4 @@
-package com.doseyenc.photosharing.ui
+package com.doseyenc.photosharing
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
