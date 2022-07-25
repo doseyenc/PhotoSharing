@@ -18,5 +18,9 @@
         android:id="@+id/uploadFragment"
         android:name="com.doseyenc.photosharing.ui.uploadImage.UploadFragment"
         android:label="fragment_upload"
-        tools:layout="@layout/fragment_upload" />
+        tools:layout="@layout/fragment_upload" >
+        <action
+            android:id="@+id/action_uploadFragment_to_feedFragment"
+            app:destination="@id/feedFragment" />
+    </fragment>
 </navigation>
