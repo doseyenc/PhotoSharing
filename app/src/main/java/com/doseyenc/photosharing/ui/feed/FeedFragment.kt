@@ -107,7 +107,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
 
                             }
                             Log.e("postList", postList.size.toString())
-
+                            postAdapter.updateList(postList)
 
                         }
                     }
