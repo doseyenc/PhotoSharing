@@ -10,14 +10,21 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.doseyenc.photosharing.R
 import com.doseyenc.photosharing.databinding.FragmentUploadBinding
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.util.*
 
 
 class UploadFragment : Fragment(R.layout.fragment_upload) {
@@ -26,6 +33,8 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
     var selectedImage: Uri? = null
     var selectecBitmap: Bitmap? = null
     private lateinit var storage: FirebaseStorage
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseFirestore
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,13 +42,17 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
     ): View? {
         _binding = FragmentUploadBinding.inflate(inflater, container, false)
         val view = binding.root
+        storage = FirebaseStorage.getInstance()
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseFirestore.getInstance()
         return view
+
     }
 
     override fun onResume() {
         super.onResume()
         binding.imageViewSelect.setOnClickListener {
-           handlePermission()
+            handlePermission()
         }
 
 
@@ -47,7 +60,34 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
 
         binding.buttonShare.setOnClickListener {
             //depo işlemleri
-            val storage = FirebaseStorage.getInstance()
+            val reference = storage.reference
+            val uuid = UUID.randomUUID()
+
+            val imageRef = reference.child("images/${uuid}.jpg")
+            if (selectedImage != null) {
+                imageRef.putFile(selectedImage!!).addOnSuccessListener {
+                    val uploadedImageReference = storage.reference.child("images/${uuid}.jpg")
+                    uploadedImageReference.downloadUrl.addOnSuccessListener { uri ->
+                        val downloadUrl = uri.toString()
+                        val currentUserEmail = auth.currentUser?.email.toString()
+                        val userComment = binding.editTextTextComment.text.toString()
+                        val date = Timestamp.now()
+                        val postHashMap = hashMapOf<String , Any>()
+                        postHashMap.put("imageUrl", downloadUrl)
+                        postHashMap.put("userEmail", currentUserEmail)
+                        postHashMap.put("userComment", userComment)
+                        postHashMap.put("date", date)
+                        database.collection("Post").add(postHashMap).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d("UploadFragment", "Post added to database")
+                                findNavController().navigate(R.id.action_uploadFragment_to_feedFragment)
+                            }
+                        }.addOnFailureListener { exception ->
+                            Log.d("UploadFragment", "Error adding post to database", exception)
+                        }
+                    }
+                }
+            }
 
         }
     }
@@ -94,7 +134,7 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
                         requireActivity().contentResolver,
                         selectedImage!!
                     )
-                    selectecBitmap=ImageDecoder.decodeBitmap(source)
+                    selectecBitmap = ImageDecoder.decodeBitmap(source)
                     binding.imageViewSelect.setImageBitmap(selectecBitmap)
                 } else {
                     selectecBitmap = MediaStore.Images.Media.getBitmap(
