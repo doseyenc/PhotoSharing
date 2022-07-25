@@ -1,4 +1,4 @@
-# PhotoSharing
+# PhotoSharingApp
  
 <hr>
 <hr>
