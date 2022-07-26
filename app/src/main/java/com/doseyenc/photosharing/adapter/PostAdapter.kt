@@ -14,10 +14,10 @@ import com.doseyenc.photosharing.databinding.PostItemDesignBinding
 import com.doseyenc.photosharing.model.PostModel
 
 class PostAdapter(
-
+    private val listener: OnItemClickListener
 ):  RecyclerView.Adapter< PostAdapter.PostViewHolder>() {
     private val list = mutableListOf<PostModel>()
-    class PostViewHolder(val binding: PostItemDesignBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class PostViewHolder(val binding: PostItemDesignBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: PostModel) {
             binding.apply {
                 Glide.with(itemView)
@@ -28,6 +28,9 @@ class PostAdapter(
                     .into(imageView)
 
                 textViewUserName.text = post.userEmail
+                root.setOnClickListener {
+                    listener.onItemClick(post)
+                }
             }
         }
     }
@@ -53,6 +56,9 @@ class PostAdapter(
         list.clear()
         list.addAll(newList)
         notifyDataSetChanged()
+    }
+    interface OnItemClickListener {
+        fun onItemClick(post: PostModel)
     }
 
 

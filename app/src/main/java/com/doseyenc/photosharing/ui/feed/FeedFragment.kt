@@ -18,7 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 
-class FeedFragment : Fragment(R.layout.fragment_feed) {
+class FeedFragment : Fragment(R.layout.fragment_feed), PostAdapter.OnItemClickListener {
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
 
@@ -57,7 +57,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
 
     private fun setupRecyclerView() {
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
-        postAdapter = PostAdapter()
+        postAdapter = PostAdapter(this)
         binding.rvFeed.adapter = postAdapter
 
     }
@@ -115,7 +115,9 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             }
         postAdapter.updateList(postList)
     }
-
+    override fun onItemClick(post: PostModel) {
+        findNavController().navigate(FeedFragmentDirections.actionFeedFragmentToDetailFragment(post))
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
