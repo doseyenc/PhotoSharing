@@ -29,20 +29,31 @@ class LoginActivity : AppCompatActivity() {
 
             val email: String = binding.editTextTextEmailAddress.text.toString()
             val password: String = binding.editTextTextPassword.text.toString()
-            createUser(
-                email,
-                password
-            )
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            } else {
+                createUser(
+                    email,
+                    password
+                )
+            }
+
         }
         binding.buttonLogin.setOnClickListener {
             val email: String = binding.editTextTextEmailAddress.text.toString()
             val password: String = binding.editTextTextPassword.text.toString()
-            logIn(
-                email,
-                password
-            )
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            } else {
+                logIn(
+                    email,
+                    password
+                )
+            }
         }
     }
+
+
 
     private fun isLogged(currentUser: FirebaseUser?) {
         if (currentUser != null) {
