@@ -45,6 +45,7 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
         storage = FirebaseStorage.getInstance()
         auth = FirebaseAuth.getInstance()
         database = FirebaseFirestore.getInstance()
+        binding.progressBar.visibility =View.GONE
         return view
 
     }
@@ -88,7 +89,7 @@ class UploadFragment : Fragment(R.layout.fragment_upload) {
                     }
                 }
             }
-
+            binding.progressBar.visibility =View.VISIBLE
         }
     }
 
